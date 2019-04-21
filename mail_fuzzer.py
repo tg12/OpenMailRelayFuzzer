@@ -46,7 +46,7 @@ def thread_worker(thread_no, me, you, svr):
             a = str(r)
             if ("250" in a):
                 print(
-                    "[+]The target system seems vulenarble to Open relay attack, FOUND!!\t\t" +
+                    "[+]The target system seems vulnerable to Open relay attack, FOUND!!\t\t" +
                     str(svr))
             else:
                 print("[-]The target system is not vulnerable to Open relay attack ")
