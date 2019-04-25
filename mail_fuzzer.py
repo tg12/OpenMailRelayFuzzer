@@ -17,42 +17,60 @@ from smtplib import *
 port = 25
 thread_list = []
 
+def debug_info(err_str):
+    # Standard debugging function, pass it a string
+    # print("-----------------DEBUG-----------------")
+    f.write(str(time.strftime("%H:%M:%S")) +
+            ":!!!DEBUG!!!:\n" + str(err_str) + "\n")
+    # print("-----------------DEBUG-----------------")
+
+
+now = datetime.now()
+f = open(now.strftime('mylogfile_%H_%M_%d_%m_%Y.log'), "a")
+
+debug_info("Starting...")
 
 def thread_worker(thread_no, me, you, svr):
-    print("[+]trying...")
-    # me == the sender's email address
-    print("[+]from...\t\t" + str(me))
-    # you == the recsvrient's email address
-    print("[+]to...\t\t" + str(you))
-    print("[+]server...\t\t" + str(svr))
+    try:
+        print("[+]trying...")
+        # me == the sender's email address
+        print("[+]from...\t\t" + str(me))
+        # you == the recsvrient's email address
+        print("[+]to...\t\t" + str(you))
+        print("[+]server...\t\t" + str(svr))
 
-    s = socket.socket()
-    s.connect((svr, int(port)))
-    socket.setdefaulttimeout(3)
-    ans = s.recv(1024)
+        s = socket.socket()
+        s.connect((svr, int(port)))
+        socket.setdefaulttimeout(3)
+        ans = s.recv(1024)
 
-    if ("220" in ans):
-        print(
-            "\n[+]port" +
-            " " +
-            str(port) +
-            " " +
-            "open on the target system\n")
-        smtpserver = smtplib.SMTP(svr, int(port))
-        r = smtpserver.docmd("Mail From:", me)
-        a = str(r)
-        if ("250" in a):
-            r = smtpserver.docmd("RCPT TO:", you)
+        if ("220" in ans):
+            print(
+                "\n[+]port" +
+                " " +
+                str(port) +
+                " " +
+                "open on the target system\n")
+            smtpserver = smtplib.SMTP(svr, int(port))
+            r = smtpserver.docmd("Mail From:", me)
             a = str(r)
             if ("250" in a):
-                print(
-                    "[+]The target system seems vulnerable to Open relay attack, FOUND!!\t\t" +
-                    str(svr))
-            else:
-                print("[-]The target system is not vulnerable to Open relay attack ")
-    else:
-        print("[-]port is closed/Filtered")
-
+                r = smtpserver.docmd("RCPT TO:", you)
+                a = str(r)
+                if ("250" in a):
+                    print(
+                        "[+]The target system seems vulenarble to Open relay attack, FOUND!!\t\t" +
+                        str(svr))
+                    debug_info(
+                        "[+]The target system seems vulenarble to Open relay attack, FOUND!!\t\t" +
+                        str(svr))
+                else:
+                    print("[-]The target system is not vulnerable to Open relay attack ")
+        else:
+            print("[-]port is closed/Filtered")
+    except Exception as e:
+            #print(e)
+            pass
 
 while True:
     for thread_no in range(1):
